@@ -17,7 +17,7 @@ function getQuetesDuJour() {
   const shuffled = [...QUETES].sort((a, b) => 
     ((hash * QUETES.indexOf(a)) % 7) - ((hash * QUETES.indexOf(b)) % 7)
   );
-  return shuffled.slice(0, 3);
+  return shuffled.slice(0, 5);
 }
 
 function getDateAujourdhui() {
