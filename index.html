@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoloQuest — Éveil du Chasseur</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="login-container">
+
+    <div class="logo">
+      <span class="logo-icon">⚔️</span>
+      <h1>SoloQuest</h1>
+      <p class="tagline">Chaque rep te rapproche du rang S</p>
+    </div>
+
+    <div class="form-card">
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Mot de passe" />
+
+      <div class="btn-group">
+        <button id="btn-inscription">Inscription</button>
+        <button id="btn-connexion">Connexion</button>
+      </div>
+
+      <button id="btn-mdp-oublie">Mot de passe oublié ?</button>
+
+      <p id="message-erreur" class="hidden"></p>
+    </div>
+
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="auth.js"></script>
+</body>
+</html>
