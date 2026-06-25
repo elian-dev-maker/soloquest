@@ -135,8 +135,9 @@ button:hover {
   text-align: center;
 }
 /* DASHBOARD */
-.dashboard {
+ .dashboard {
   padding: 1.5rem;
+  padding-bottom: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -303,4 +304,124 @@ button:hover {
   20%  { opacity: 1; transform: translateX(-50%) translateY(0); }
   80%  { opacity: 1; }
   100% { opacity: 0; }
+}
+/* CUSTOMISATION */
+.custom-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.custom-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-retour {
+  color: var(--texte-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.custom-header h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.avatar-preview {
+  display: flex;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 220px;
+}
+
+.avatar-preview svg {
+  height: 100%;
+  width: auto;
+}
+
+.custom-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.custom-section label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--texte-dim);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.couleurs-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.couleur-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.couleur-btn.active {
+  border-color: white;
+}
+
+.btn-option {
+  flex: 1;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--texte-dim);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-option.active {
+  border-color: var(--violet);
+  color: var(--texte);
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, var(--violet), var(--bleu));
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+}
+.btn-custom {
+  display: block;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--violet);
+  color: var(--violet);
+  padding: 0.875rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 1.5rem 1.5rem;
 }

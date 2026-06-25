@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoloQuest — Personnalisation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="custom-container">
+
+    <div class="custom-header">
+      <a href="dashboard.html" class="btn-retour">← Retour</a>
+      <h1>Personnaliser mon chasseur</h1>
+    </div>
+
+    <!-- Prévisualisation avatar -->
+    <div class="avatar-preview" id="avatar-preview">
+      <!-- SVG généré par JS -->
+    </div>
+
+    <!-- Options -->
+    <div class="custom-card">
+
+      <!-- Genre -->
+      <div class="custom-section">
+        <label>Genre</label>
+        <div class="btn-group">
+          <button class="btn-option active" data-type="genre" data-value="masculin">⚔️ Masculin</button>
+          <button class="btn-option" data-type="genre" data-value="feminin">🌸 Féminin</button>
+        </div>
+      </div>
+
+      <!-- Couleur de peau -->
+      <div class="custom-section">
+        <label>Couleur de peau</label>
+        <div class="couleurs-grid">
+          <div class="couleur-btn active" data-type="peau" data-value="#FDDBB4" style="background:#FDDBB4"></div>
+          <div class="couleur-btn" data-type="peau" data-value="#F5C896" style="background:#F5C896"></div>
+          <div class="couleur-btn" data-type="peau" data-value="#E8A87C" style="background:#E8A87C"></div>
+          <div class="couleur-btn" data-type="peau" data-value="#C68642" style="background:#C68642"></div>
+          <div class="couleur-btn" data-type="peau" data-value="#8D5524" style="background:#8D5524"></div>
+          <div class="couleur-btn" data-type="peau" data-value="#4A2912" style="background:#4A2912"></div>
+        </div>
+      </div>
+
+      <!-- Couleur de cheveux -->
+      <div class="custom-section">
+        <label>Couleur des cheveux</label>
+        <div class="couleurs-grid">
+          <div class="couleur-btn active" data-type="cheveux" data-value="#1a1a1a" style="background:#1a1a1a"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#4a2c0a" style="background:#4a2c0a"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#8B4513" style="background:#8B4513"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#DAA520" style="background:#DAA520"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#B22222" style="background:#B22222"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#f0f0f0" style="background:#f0f0f0"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#3b82f6" style="background:#3b82f6"></div>
+          <div class="couleur-btn" data-type="cheveux" data-value="#7c3aed" style="background:#7c3aed"></div>
+        </div>
+      </div>
+
+      <!-- Couleur des yeux -->
+      <div class="custom-section">
+        <label>Couleur des yeux</label>
+        <div class="couleurs-grid">
+          <div class="couleur-btn active" data-type="yeux" data-value="#3b82f6" style="background:#3b82f6"></div>
+          <div class="couleur-btn" data-type="yeux" data-value="#10b981" style="background:#10b981"></div>
+          <div class="couleur-btn" data-type="yeux" data-value="#6b7280" style="background:#6b7280"></div>
+          <div class="couleur-btn" data-type="yeux" data-value="#8B4513" style="background:#8B4513"></div>
+          <div class="couleur-btn" data-type="yeux" data-value="#1a1a1a" style="background:#1a1a1a"></div>
+          <div class="couleur-btn" data-type="yeux" data-value="#7c3aed" style="background:#7c3aed"></div>
+        </div>
+      </div>
+
+      <button id="btn-sauvegarder" class="btn-save">💾 Sauvegarder</button>
+
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="avatar.js"></script>
+  <script type="module" src="customisation.js"></script>
+</body>
+</html>

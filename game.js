@@ -1,7 +1,7 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+import { genererAvatar } from './avatar.js';
 const QUETES = [
   { id: "q1", titre: "Éveil du Corps",     description: "Fais 20 pompes",            xp: 30, emoji: "💪" },
   { id: "q2", titre: "Marche du Chasseur", description: "Marche 20 minutes",         xp: 25, emoji: "🚶" },
@@ -60,6 +60,10 @@ function afficherProfil(profil) {
   const pct = Math.min((profil.xp / profil.xpPourLevelUp) * 100, 100);
   document.getElementById('xp-fill').style.width = pct + '%';
   document.getElementById('xp-texte').textContent = `${profil.xp} / ${profil.xpPourLevelUp} XP`;
+  const avatarContainer = document.getElementById('avatar-container');
+if (avatarContainer) {
+  avatarContainer.innerHTML = genererAvatar(profil.niveau, profil.avatar || {});
+}
 }
 
 async function afficherQuetes(uid, profil) {
