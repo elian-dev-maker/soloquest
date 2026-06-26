@@ -2,7 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const BASE_URL = 'https://corsproxy.io/?https://raw.githubusercontent.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator/master/spritesheets/';
+const BASE_URL = 'https://cdn.jsdelivr.net/gh/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator@master/spritesheets/';
 
 const SKIN_OPTIONS = [
   { key: 'light',   hex: '#F5D5A8' },
