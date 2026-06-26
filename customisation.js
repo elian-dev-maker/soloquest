@@ -67,22 +67,25 @@ let userId = null;
 
 // ─── Canvas colorize ──────────────────────────────────────────────────────────
 
-function hexToRgb(hex) {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-function colorizeData(data, tr, tg, tb) {
+function colorizeHair(ctx, hexColor) {
+  const imageData = ctx.getImageData(0, 0, 64, 64);
+  const data = imageData.data;
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
   for (let i = 0; i < data.length; i += 4) {
-    if (data[i + 3] === 0) continue;
-    const lum = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
-    data[i]     = Math.round(tr * lum);
-    data[i + 1] = Math.round(tg * lum);
-    data[i + 2] = Math.round(tb * lum);
+    if (data[i + 3] > 0) {
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * 255);
+      data[i]     = Math.round(r * brightness);
+      data[i + 1] = Math.round(g * brightness);
+      data[i + 2] = Math.round(b * brightness);
+    }
   }
+  ctx.putImageData(imageData, 0, 0);
 }
 
 // Draw a loaded image onto ctx, optionally colorizing with hexColor.
+// Colorization runs on an offscreen canvas so only this layer is affected.
 // Source crop: idle frame at row 10, col 0 → x=0, y=640, w=64, h=64.
 function drawLayer(ctx, img, hexColor) {
   if (!hexColor) {
@@ -96,9 +99,7 @@ function drawLayer(ctx, img, hexColor) {
   const offCtx = off.getContext('2d');
   offCtx.drawImage(img, 0, 640, 64, 64, 0, 0, 64, 64);
 
-  const imgData = offCtx.getImageData(0, 0, 64, 64);
-  colorizeData(imgData.data, ...hexToRgb(hexColor));
-  offCtx.putImageData(imgData, 0, 0);
+  colorizeHair(offCtx, hexColor);
 
   ctx.drawImage(off, 0, 0);
 }
