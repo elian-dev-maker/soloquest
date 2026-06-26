@@ -5,81 +5,232 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SoloQuest — Personnalisation</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* === PREVIEW === */
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    #canvas-wrap {
+      position: relative;
+      display: inline-block;
+      background: #0d0d1f;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    #character-canvas {
+      display: block;
+      width: 256px;
+      height: 256px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+    }
+
+    .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    .spinner-ring {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(124, 58, 237, 0.2);
+      border-top-color: var(--violet);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .rang-badge {
+      margin-top: 0.875rem;
+      padding: 4px 20px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, var(--violet), var(--bleu));
+      color: white;
+    }
+
+    .s-rank-glow {
+      filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.9))
+              drop-shadow(0 0 24px rgba(59, 130, 246, 0.6));
+    }
+
+    /* === HAIR STYLES === */
+    .hair-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .hair-scroll::-webkit-scrollbar { height: 3px; }
+    .hair-scroll::-webkit-scrollbar-track { background: transparent; }
+    .hair-scroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .hair-thumb {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      border-radius: 10px;
+      padding: 4px;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .hair-thumb.active {
+      border-color: var(--violet);
+    }
+
+    .hair-thumb canvas {
+      width: 60px;
+      height: 60px;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hair-thumb span {
+      font-size: 0.6rem;
+      color: var(--texte-dim);
+      text-align: center;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* === STICKY BOTTOM === */
+    .sticky-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: var(--bg-dark);
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 1.5rem 1rem;
+      z-index: 100;
+    }
+
+    .has-sticky-bottom {
+      padding-bottom: 150px;
+    }
+
+    /* === BOTTOM NAV === */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 0.75rem;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-decoration: none;
+      color: var(--texte-dim);
+      font-size: 0.7rem;
+      padding: 4px 20px;
+      border-radius: 8px;
+      transition: color 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--violet);
+    }
+
+    .nav-icon {
+      font-size: 1.3rem;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="custom-container">
+  <div class="custom-container has-sticky-bottom">
 
     <div class="custom-header">
       <a href="dashboard.html" class="btn-retour">← Retour</a>
       <h1>Personnaliser mon chasseur</h1>
     </div>
 
-    <!-- Prévisualisation avatar -->
-    <div class="avatar-preview" id="avatar-preview">
-      <!-- SVG généré par JS -->
-    </div>
+    <!-- Prévisualisation -->
+    <section class="preview-section">
+      <div id="canvas-wrap">
+        <canvas id="character-canvas" width="64" height="64"></canvas>
+        <div id="loading-spinner" class="spinner hidden">
+          <div class="spinner-ring"></div>
+        </div>
+      </div>
+      <div id="rang-badge" class="rang-badge">RANG F</div>
+    </section>
 
     <!-- Options -->
     <div class="custom-card">
 
-      <!-- Genre -->
       <div class="custom-section">
         <label>Genre</label>
-        <div class="btn-group">
-          <button class="btn-option active" data-type="genre" data-value="masculin">⚔️ Masculin</button>
-          <button class="btn-option" data-type="genre" data-value="feminin">🌸 Féminin</button>
-        </div>
+        <div id="section-genre"></div>
       </div>
 
-      <!-- Couleur de peau -->
       <div class="custom-section">
         <label>Couleur de peau</label>
-        <div class="couleurs-grid">
-          <div class="couleur-btn active" data-type="peau" data-value="#FDDBB4" style="background:#FDDBB4"></div>
-          <div class="couleur-btn" data-type="peau" data-value="#F5C896" style="background:#F5C896"></div>
-          <div class="couleur-btn" data-type="peau" data-value="#E8A87C" style="background:#E8A87C"></div>
-          <div class="couleur-btn" data-type="peau" data-value="#C68642" style="background:#C68642"></div>
-          <div class="couleur-btn" data-type="peau" data-value="#8D5524" style="background:#8D5524"></div>
-          <div class="couleur-btn" data-type="peau" data-value="#4A2912" style="background:#4A2912"></div>
-        </div>
+        <div id="section-peau"></div>
       </div>
 
-      <!-- Couleur de cheveux -->
+      <div class="custom-section">
+        <label>Coiffure</label>
+        <div id="section-coiffure"></div>
+      </div>
+
       <div class="custom-section">
         <label>Couleur des cheveux</label>
-        <div class="couleurs-grid">
-          <div class="couleur-btn active" data-type="cheveux" data-value="#1a1a1a" style="background:#1a1a1a"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#4a2c0a" style="background:#4a2c0a"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#8B4513" style="background:#8B4513"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#DAA520" style="background:#DAA520"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#B22222" style="background:#B22222"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#f0f0f0" style="background:#f0f0f0"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#3b82f6" style="background:#3b82f6"></div>
-          <div class="couleur-btn" data-type="cheveux" data-value="#7c3aed" style="background:#7c3aed"></div>
-        </div>
+        <div id="section-couleur-cheveux"></div>
       </div>
-
-      <!-- Couleur des yeux -->
-      <div class="custom-section">
-        <label>Couleur des yeux</label>
-        <div class="couleurs-grid">
-          <div class="couleur-btn active" data-type="yeux" data-value="#3b82f6" style="background:#3b82f6"></div>
-          <div class="couleur-btn" data-type="yeux" data-value="#10b981" style="background:#10b981"></div>
-          <div class="couleur-btn" data-type="yeux" data-value="#6b7280" style="background:#6b7280"></div>
-          <div class="couleur-btn" data-type="yeux" data-value="#8B4513" style="background:#8B4513"></div>
-          <div class="couleur-btn" data-type="yeux" data-value="#1a1a1a" style="background:#1a1a1a"></div>
-          <div class="couleur-btn" data-type="yeux" data-value="#7c3aed" style="background:#7c3aed"></div>
-        </div>
-      </div>
-
-      <button id="btn-sauvegarder" class="btn-save">💾 Sauvegarder</button>
 
     </div>
+
   </div>
 
-  <script type="module" src="firebase-config.js"></script>
-  <script type="module" src="avatar.js"></script>
+  <div class="sticky-bottom">
+    <button id="btn-sauvegarder" class="btn-save">💾 Sauvegarder</button>
+    <nav class="bottom-nav">
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">⚔️</span>
+        <span>Quêtes</span>
+      </a>
+      <a href="customisation.html" class="nav-item active">
+        <span class="nav-icon">🎨</span>
+        <span>Perso</span>
+      </a>
+    </nav>
+  </div>
+
   <script type="module" src="customisation.js"></script>
 </body>
 </html>
