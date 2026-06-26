@@ -2,7 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const BASE_URL = './sprites/';
+const BASE_URL = './lpc-sprites/spritesheets/';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -90,10 +90,10 @@ function colorizeHair(ctx, hexColor) {
 
 // Draw a loaded image onto ctx, optionally colorizing with hexColor.
 // Colorization runs on an offscreen canvas so only this layer is affected.
-// Source crop: idle frame at row 10, col 0 → x=0, y=640, w=64, h=64.
+// Sprites are 128x256 per-animation files; south-facing idle is at x=0, y=0.
 function drawLayer(ctx, img, hexColor) {
   if (!hexColor) {
-    ctx.drawImage(img, 0, 640, 64, 64, 0, 0, 64, 64);
+    ctx.drawImage(img, 0, 0, 64, 64, 0, 0, 64, 64);
     return;
   }
 
@@ -101,7 +101,7 @@ function drawLayer(ctx, img, hexColor) {
   off.width = 64;
   off.height = 64;
   const offCtx = off.getContext('2d');
-  offCtx.drawImage(img, 0, 640, 64, 64, 0, 0, 64, 64);
+  offCtx.drawImage(img, 0, 0, 64, 64, 0, 0, 64, 64);
 
   colorizeHair(offCtx, hexColor);
 
@@ -186,7 +186,7 @@ async function renderHairThumbnail(canvas, hairStyle) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, 64, 64);
 
-  const g       = state.genre;
+  const g = lpcGenre(state.genre);
   const skinHex = SKIN_OPTIONS.find(s => s.key === state.skin)?.hex || null;
   const hairHex = HAIR_COLOR_OPTIONS.find(h => h.key === state.hairColor)?.hex || null;
 
