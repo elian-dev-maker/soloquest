@@ -60,10 +60,61 @@ function afficherProfil(profil) {
   const pct = Math.min((profil.xp / profil.xpPourLevelUp) * 100, 100);
   document.getElementById('xp-fill').style.width = pct + '%';
   document.getElementById('xp-texte').textContent = `${profil.xp} / ${profil.xpPourLevelUp} XP`;
-  const avatarContainer = document.getElementById('avatar-container');
-if (avatarContainer) {
-  avatarContainer.innerHTML = genererAvatar(profil.niveau, profil.avatar || {});
+  renderAvatarCanvas(profil);
 }
+
+const SKIN_HEX = { light: '#F5D5A8', tanned: '#C68642', tanned2: '#D4894A', dark: '#8D5524', dark2: '#6B3A16', darkelf: '#4A2912' };
+const HAIR_HEX = { black: '#1a1a1a', blonde: '#F5E136', blue: '#3b82f6', brown: '#5C3317', brunette: '#3D1C02', gold: '#FFD700', gray: '#9CA3AF', green: '#10b981', light: '#F5DEB3', orange: '#F97316', pink: '#EC4899', purple: '#8B5CF6', raven: '#1c1c2e', redhead: '#C0392B', silver: '#C0C0C0', teal: '#14B8A6', white: '#F5F5F5' };
+
+async function renderAvatarCanvas(profil) {
+  const canvas = document.getElementById('avatar-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const av = profil.avatar || {};
+  const g = av.genre === 'masculin' ? 'male' : av.genre === 'feminin' ? 'female' : (av.genre || 'male');
+  const hairStyle = av.hairStyle || 'plain';
+  const skinHex = SKIN_HEX[av.skin] || '#F5D5A8';
+  const hairHex = HAIR_HEX[av.hairColor] || '#1a1a1a';
+
+  const loadImg = src => new Promise(res => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => res(img);
+    img.onerror = () => res(null);
+    img.src = src;
+  });
+
+  const tintLayer = (img, hex) => {
+    if (!img) return;
+    const off = document.createElement('canvas');
+    off.width = 64; off.height = 64;
+    const oc = off.getContext('2d');
+    oc.drawImage(img, 0, 128, 64, 64, 0, 0, 64, 64);
+    const id = oc.getImageData(0, 0, 64, 64);
+    const d = id.data;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const gv = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] > 0) {
+        const br = (d[i] + d[i + 1] + d[i + 2]) / (3 * 255);
+        d[i] = Math.round(r * br); d[i + 1] = Math.round(gv * br); d[i + 2] = Math.round(b * br);
+      }
+    }
+    oc.putImageData(id, 0, 0);
+    ctx.drawImage(off, 0, 0);
+  };
+
+  const [bodyImg, headImg, hairImg] = await Promise.all([
+    loadImg(`./sprites/body/bodies/${g}/idle.png`),
+    loadImg(`./sprites/head/human/${g}/idle.png`),
+    loadImg(`./sprites/hair/${hairStyle}/adult/idle.png`),
+  ]);
+
+  ctx.clearRect(0, 0, 64, 64);
+  tintLayer(bodyImg, skinHex);
+  tintLayer(headImg, skinHex);
+  tintLayer(hairImg, hairHex);
 }
 
 async function afficherQuetes(uid, profil) {

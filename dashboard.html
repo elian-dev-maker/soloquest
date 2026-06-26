@@ -12,19 +12,19 @@
 
     <!-- CARTE PERSONNAGE -->
     <div class="hero-card">
-      <div class="hero-top">
-        <div class="avatar" id="avatar-container"></div
-        <div class="hero-info">
+      <div class="hero-main">
+        <div class="hero-info-col">
           <h2 id="pseudo">Chasseur</h2>
           <span class="niveau-badge">Niveau <span id="niveau">1</span></span>
+          <div class="xp-section">
+            <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+            <p id="xp-texte">0 / 100 XP</p>
+          </div>
+          <button id="btn-deconnexion" class="btn-deco">Quitter</button>
         </div>
-        <button id="btn-deconnexion" class="btn-deco">Quitter</button>
-      </div>
-      <div class="xp-section">
-        <div class="xp-bar">
-          <div class="xp-fill" id="xp-fill"></div>
+        <div class="hero-avatar-col">
+          <canvas id="avatar-canvas" width="64" height="64"></canvas>
         </div>
-        <p id="xp-texte">0 / 100 XP</p>
       </div>
     </div>
 
