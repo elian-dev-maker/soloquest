@@ -90,30 +90,36 @@ async function renderAvatarCanvas(profil) {
     off.width = 64; off.height = 64;
     const oc = off.getContext('2d');
     oc.drawImage(img, 0, 128, 64, 64, 0, 0, 64, 64);
-    const id = oc.getImageData(0, 0, 64, 64);
-    const d = id.data;
-    const r = parseInt(hex.slice(1, 3), 16);
-    const gv = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    for (let i = 0; i < d.length; i += 4) {
-      if (d[i + 3] > 0) {
-        const br = (d[i] + d[i + 1] + d[i + 2]) / (3 * 255);
-        d[i] = Math.round(r * br); d[i + 1] = Math.round(gv * br); d[i + 2] = Math.round(b * br);
+    if (hex) {
+      const id = oc.getImageData(0, 0, 64, 64);
+      const d = id.data;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const gv = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] > 0) {
+          const br = (d[i] + d[i + 1] + d[i + 2]) / (3 * 255);
+          d[i] = Math.round(r * br); d[i + 1] = Math.round(gv * br); d[i + 2] = Math.round(b * br);
+        }
       }
+      oc.putImageData(id, 0, 0);
     }
-    oc.putImageData(id, 0, 0);
     ctx.drawImage(off, 0, 0);
   };
 
-  const [bodyImg, headImg, hairImg] = await Promise.all([
+  const [bodyImg, headImg, pantsImg, torsoImg, hairImg] = await Promise.all([
     loadImg(`./sprites/body/bodies/${g}/idle.png`),
     loadImg(`./sprites/head/human/${g}/idle.png`),
+    loadImg(`./sprites/legs/pants/male/idle.png`),
+    loadImg(`./sprites/torso/clothes/longsleeve/longsleeve/${g}/idle.png`),
     loadImg(`./sprites/hair/${hairStyle}/adult/idle.png`),
   ]);
 
   ctx.clearRect(0, 0, 64, 64);
   tintLayer(bodyImg, skinHex);
   tintLayer(headImg, skinHex);
+  tintLayer(pantsImg, null);
+  tintLayer(torsoImg, null);
   tintLayer(hairImg, hairHex);
 }
 
