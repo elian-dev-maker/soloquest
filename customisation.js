@@ -2,7 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const BASE_URL = './lpc-sprites/spritesheets/';
+const BASE_URL = './sprites/';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
