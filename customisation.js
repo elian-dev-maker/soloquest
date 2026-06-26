@@ -2,7 +2,9 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const BASE_URL = 'https://cdn.jsdelivr.net/gh/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator@master/spritesheets/';
+const BASE_URL = './lpc-sprites/spritesheets/';
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const SKIN_OPTIONS = [
   { key: 'light',   hex: '#F5D5A8' },
@@ -13,9 +15,10 @@ const SKIN_OPTIONS = [
   { key: 'darkelf', hex: '#4A2912' },
 ];
 
+// All paths confirmed: hair/{style}/adult/idle.png
 const HAIR_STYLES = [
-  'plain', 'bangs', 'bangs2', 'long', 'longhawk',
-  'mohawk', 'pixie', 'princess', 'shaved', 'swoop', 'unkempt',
+  'plain', 'bangs', 'bangslong', 'bob', 'long',
+  'longhawk', 'pixie', 'buzzcut', 'spiked', 'shorthawk', 'swoop', 'unkempt',
 ];
 
 const HAIR_COLOR_OPTIONS = [
@@ -38,44 +41,97 @@ const HAIR_COLOR_OPTIONS = [
   { key: 'white',    hex: '#F5F5F5' },
 ];
 
+// Actual spritesheet paths (confirmed on disk):
+//   torso: torso/clothes/longsleeve/longsleeve/{g}/idle.png
+//          torso/clothes/shortsleeve/shortsleeve/{g}/idle.png
+//          torso/armour/leather/{g}/idle.png
+//          torso/chainmail/{g}/idle.png
+//          torso/armour/plate/{g}/idle.png
+//          torso/armour/legion/{g}/idle.png
+//   legs:  legs/pants/male/idle.png  (female idle missing — use male fallback)
 function getOutfit(niv) {
-  if (niv <= 5)   return { torso: 'shirt_longsleeve',    leg: 'pants',                          rang: 'F' };
-  if (niv <= 15)  return { torso: 'shirt',               leg: 'pants',                          rang: 'E' };
-  if (niv <= 30)  return { torso: 'leather_armor_shirt', leg: 'leather_armor_pants_longsleeve', rang: 'D' };
-  if (niv <= 50)  return { torso: 'chain_armor_shirt',   leg: 'chain_armor_pants_longsleeve',   rang: 'C' };
-  if (niv <= 75)  return { torso: 'plate_armor_shirt',   leg: 'plate_armor_pants',              rang: 'B' };
-  if (niv <= 100) return { torso: 'legion_armor_torso',  leg: 'legion_armor_legs',              rang: 'A' };
-  return               { torso: 'robe_shirt',            leg: 'robe_pants',                     rang: 'S' };
+  if (niv <= 5)   return { torso: 'torso/clothes/longsleeve/longsleeve', leg: 'legs/pants', rang: 'F' };
+  if (niv <= 15)  return { torso: 'torso/clothes/shortsleeve/shortsleeve', leg: 'legs/pants', rang: 'E' };
+  if (niv <= 30)  return { torso: 'torso/armour/leather',                  leg: 'legs/pants', rang: 'D' };
+  if (niv <= 50)  return { torso: 'torso/chainmail',                       leg: 'legs/pants', rang: 'C' };
+  if (niv <= 75)  return { torso: 'torso/armour/plate',                    leg: 'legs/pants', rang: 'B' };
+  if (niv <= 100) return { torso: 'torso/armour/legion',                   leg: 'legs/pants', rang: 'A' };
+  return               { torso: 'torso/armour/legion',                    leg: 'legs/pants', rang: 'S' };
 }
+
+// ─── State ────────────────────────────────────────────────────────────────────
 
 let state = { genre: 'male', skin: 'light', hairStyle: 'plain', hairColor: 'black' };
 let niveau = 1;
 let userId = null;
+
+// ─── Canvas colorize ──────────────────────────────────────────────────────────
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function colorizeData(data, tr, tg, tb) {
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] === 0) continue;
+    const lum = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+    data[i]     = Math.round(tr * lum);
+    data[i + 1] = Math.round(tg * lum);
+    data[i + 2] = Math.round(tb * lum);
+  }
+}
+
+// Draw a loaded image onto ctx, optionally colorizing with hexColor.
+// Source crop: idle frame at row 10, col 0 → x=0, y=640, w=64, h=64.
+function drawLayer(ctx, img, hexColor) {
+  if (!hexColor) {
+    ctx.drawImage(img, 0, 640, 64, 64, 0, 0, 64, 64);
+    return;
+  }
+
+  const off = document.createElement('canvas');
+  off.width = 64;
+  off.height = 64;
+  const offCtx = off.getContext('2d');
+  offCtx.drawImage(img, 0, 640, 64, 64, 0, 0, 64, 64);
+
+  const imgData = offCtx.getImageData(0, 0, 64, 64);
+  colorizeData(imgData.data, ...hexToRgb(hexColor));
+  offCtx.putImageData(imgData, 0, 0);
+
+  ctx.drawImage(off, 0, 0);
+}
 
 // ─── Image loading ────────────────────────────────────────────────────────────
 
 function loadImage(url) {
   return new Promise(resolve => {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
+    img.onload  = () => resolve(img);
     img.onerror = () => resolve(null);
     img.src = url;
   });
 }
 
-// ─── Main canvas ──────────────────────────────────────────────────────────────
+// ─── Layer list ───────────────────────────────────────────────────────────────
 
 function getMainLayers() {
   const { torso, leg } = getOutfit(niveau);
   const g = state.genre;
+  const skinHex = SKIN_OPTIONS.find(s => s.key === state.skin)?.hex || null;
+  const hairHex = HAIR_COLOR_OPTIONS.find(h => h.key === state.hairColor)?.hex || null;
+
   return [
-    `body/${g}/${state.skin}.png`,
-    `hair/${state.hairStyle}/${g}/${state.hairColor}.png`,
-    `torso/${torso}/${g}/white.png`,
-    `leg/${leg}/${g}/white.png`,
+    // female idle pants don't exist — use male for both genders
+    { path: `body/bodies/${g}/idle.png`,            color: skinHex },
+    { path: `hair/${state.hairStyle}/adult/idle.png`, color: hairHex },
+    { path: `${torso}/${g}/idle.png`,               color: null    },
+    { path: `${leg}/male/idle.png`,                 color: null    },
   ];
 }
+
+// ─── Main canvas ──────────────────────────────────────────────────────────────
 
 function drawPlaceholder(ctx) {
   ctx.clearRect(0, 0, 64, 64);
@@ -86,25 +142,25 @@ function drawPlaceholder(ctx) {
 }
 
 async function renderCharacter(skipThumbs = false) {
-  const canvas = document.getElementById('character-canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas  = document.getElementById('character-canvas');
+  const ctx     = canvas.getContext('2d');
   const spinner = document.getElementById('loading-spinner');
 
   spinner.classList.remove('hidden');
+  ctx.clearRect(0, 0, 64, 64);
 
   try {
-    const images = await Promise.all(
-      getMainLayers().map(p => loadImage(BASE_URL + p))
-    );
+    const layers = getMainLayers();
+    const images = await Promise.all(layers.map(l => loadImage(BASE_URL + l.path)));
 
-    ctx.clearRect(0, 0, 64, 64);
     let anyLoaded = false;
-    for (const img of images) {
-      if (img) {
-        ctx.drawImage(img, 0, 640, 64, 64, 0, 0, 64, 64);
-        anyLoaded = true;
-      }
+    for (let i = 0; i < layers.length; i++) {
+      const img = images[i];
+      if (!img) continue;
+      anyLoaded = true;
+      drawLayer(ctx, img, layers[i].color);
     }
+
     if (!anyLoaded) drawPlaceholder(ctx);
   } catch {
     drawPlaceholder(canvas.getContext('2d'));
@@ -124,13 +180,18 @@ async function renderCharacter(skipThumbs = false) {
 async function renderHairThumbnail(canvas, hairStyle) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, 64, 64);
-  const g = state.genre;
+
+  const g       = state.genre;
+  const skinHex = SKIN_OPTIONS.find(s => s.key === state.skin)?.hex || null;
+  const hairHex = HAIR_COLOR_OPTIONS.find(h => h.key === state.hairColor)?.hex || null;
+
   const [bodyImg, hairImg] = await Promise.all([
-    loadImage(BASE_URL + `body/${g}/${state.skin}.png`),
-    loadImage(BASE_URL + `hair/${hairStyle}/${g}/${state.hairColor}.png`),
+    loadImage(BASE_URL + `body/bodies/${g}/idle.png`),
+    loadImage(BASE_URL + `hair/${hairStyle}/adult/idle.png`),
   ]);
-  if (bodyImg) ctx.drawImage(bodyImg, 0, 640, 64, 64, 0, 0, 64, 64);
-  if (hairImg) ctx.drawImage(hairImg, 0, 640, 64, 64, 0, 0, 64, 64);
+
+  if (bodyImg) drawLayer(ctx, bodyImg, skinHex);
+  if (hairImg) drawLayer(ctx, hairImg, hairHex);
 }
 
 function renderAllThumbnails() {
@@ -142,7 +203,7 @@ function renderAllThumbnails() {
 // ─── UI builders ──────────────────────────────────────────────────────────────
 
 function buildGenreSection() {
-  const el = document.getElementById('section-genre');
+  const el    = document.getElementById('section-genre');
   const group = document.createElement('div');
   group.className = 'btn-group';
 
@@ -167,7 +228,7 @@ function buildGenreSection() {
 }
 
 function buildSkinSection() {
-  const el = document.getElementById('section-peau');
+  const el   = document.getElementById('section-peau');
   const grid = document.createElement('div');
   grid.className = 'couleurs-grid';
 
@@ -190,17 +251,17 @@ function buildSkinSection() {
 }
 
 function buildHairStyleSection() {
-  const el = document.getElementById('section-coiffure');
+  const el     = document.getElementById('section-coiffure');
   const scroll = document.createElement('div');
   scroll.className = 'hair-scroll';
 
   HAIR_STYLES.forEach(style => {
-    const thumb = document.createElement('div');
+    const thumb  = document.createElement('div');
     thumb.className = 'hair-thumb' + (state.hairStyle === style ? ' active' : '');
     thumb.dataset.style = style;
 
     const canvas = document.createElement('canvas');
-    canvas.width = 64;
+    canvas.width  = 64;
     canvas.height = 64;
 
     const label = document.createElement('span');
@@ -224,7 +285,7 @@ function buildHairStyleSection() {
 }
 
 function buildHairColorSection() {
-  const el = document.getElementById('section-couleur-cheveux');
+  const el   = document.getElementById('section-couleur-cheveux');
   const grid = document.createElement('div');
   grid.className = 'couleurs-grid';
 
@@ -261,7 +322,7 @@ onAuthStateChanged(auth, async (user) => {
   userId = user.uid;
 
   try {
-    const snap = await getDoc(doc(db, 'users', user.uid));
+    const snap  = await getDoc(doc(db, 'users', user.uid));
     const profil = snap.data() || {};
     niveau = profil.niveau || 1;
     if (profil.avatar) state = { ...state, ...profil.avatar };
