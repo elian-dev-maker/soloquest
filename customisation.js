@@ -65,6 +65,10 @@ let state = { genre: 'male', skin: 'light', hairStyle: 'plain', hairColor: 'blac
 let niveau = 1;
 let userId = null;
 
+function lpcGenre(genre) {
+  return genre === 'masculin' ? 'male' : genre === 'feminin' ? 'female' : genre;
+}
+
 // ─── Canvas colorize ──────────────────────────────────────────────────────────
 
 function colorizeHair(ctx, hexColor) {
@@ -119,7 +123,7 @@ function loadImage(url) {
 
 function getMainLayers() {
   const { torso, leg } = getOutfit(niveau);
-  const g = state.genre;
+  const g = lpcGenre(state.genre);
   const skinHex = SKIN_OPTIONS.find(s => s.key === state.skin)?.hex || null;
   const hairHex = HAIR_COLOR_OPTIONS.find(h => h.key === state.hairColor)?.hex || null;
 
