@@ -89,11 +89,11 @@ function colorizeHair(ctx, hexColor) {
 }
 
 // Draw a loaded image onto ctx, optionally colorizing with hexColor.
-// Colorization runs on an offscreen canvas so only this layer is affected.
-// Sprites are 128x256 per-animation files; south-facing idle is at x=0, y=0.
+// Sprites are 128x256 idle sheets (2 cols × 4 rows of 64×64).
+// Row 2 (y=128) is south-facing (camera-facing); that's the frame we display.
 function drawLayer(ctx, img, hexColor) {
   if (!hexColor) {
-    ctx.drawImage(img, 0, 0, 64, 64, 0, 0, 64, 64);
+    ctx.drawImage(img, 0, 128, 64, 64, 0, 0, 64, 64);
     return;
   }
 
@@ -101,7 +101,7 @@ function drawLayer(ctx, img, hexColor) {
   off.width = 64;
   off.height = 64;
   const offCtx = off.getContext('2d');
-  offCtx.drawImage(img, 0, 0, 64, 64, 0, 0, 64, 64);
+  offCtx.drawImage(img, 0, 128, 64, 64, 0, 0, 64, 64);
 
   colorizeHair(offCtx, hexColor);
 
@@ -129,10 +129,11 @@ function getMainLayers() {
 
   return [
     // female idle pants don't exist — use male for both genders
-    { path: `body/bodies/${g}/idle.png`,            color: skinHex },
+    { path: `body/bodies/${g}/idle.png`,              color: skinHex },
+    { path: `head/human/${g}/idle.png`,               color: skinHex },
     { path: `hair/${state.hairStyle}/adult/idle.png`, color: hairHex },
-    { path: `${torso}/${g}/idle.png`,               color: null    },
-    { path: `${leg}/male/idle.png`,                 color: null    },
+    { path: `${torso}/${g}/idle.png`,                 color: null    },
+    { path: `${leg}/male/idle.png`,                   color: null    },
   ];
 }
 
